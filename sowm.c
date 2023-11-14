@@ -11,7 +11,7 @@
 #include "sowm.h"
 
 static client       *list = {0}, *ws_list[10] = {0}, *cur;
-static int          ws = 1, sw, sh, wx, wy, numlock = 0;
+static int          ws = 1, sw, sh, wx, wy, numlock = 0, running = 1;
 static unsigned int ww, wh;
 
 static Display      *d;
@@ -231,6 +231,10 @@ void mapping_notify(XEvent *e) {
     }
 }
 
+void quit(const Arg arg) {
+  running = 0;
+}
+
 void run(const Arg arg) {
     if (fork()) return;
     if (d) close(ConnectionNumber(d));
@@ -284,6 +288,6 @@ int main(void) {
     XDefineCursor(d, root, XCreateFontCursor(d, 68));
     input_grab(root);
 
-    while (1 && !XNextEvent(d, &ev)) // 1 && will forever be here.
+    while (running && !XNextEvent(d, &ev)) // 1 && will forever be here.
         if (events[ev.type]) events[ev.type](&ev);
 }
